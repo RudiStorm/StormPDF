@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:StormPDF.Controls"
+             x:Class="StormPDF.MainPage"
+             Title="StormPDF">
+    <Grid RowDefinitions="Auto,Auto,*,Auto"
+          BackgroundColor="{AppThemeBinding Light=#F3F4F6, Dark=#1E1F22}">
+        <Border Grid.Row="0"
+                Padding="12"
+                Stroke="{AppThemeBinding Light=#CDD5E1, Dark=#3D4350}"
+                BackgroundColor="{AppThemeBinding Light=#E6EBF3, Dark=#2A2D33}">
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="8">
+                <HorizontalStackLayout Spacing="10">
+                    <Button x:Name="OpenPdfButton"
+                            Text="Open"
+                            BackgroundColor="{AppThemeBinding Light=#F8F9FB, Dark=#343944}"
+                            TextColor="{AppThemeBinding Light=#1F2430, Dark=#E9EDF5}"
+                            BorderColor="{AppThemeBinding Light=#C8D0DD, Dark=#4C5565}"
+                            BorderWidth="1"
+                            FontAttributes="None"
+                            CornerRadius="4"
+                            Padding="14,7"
+                            Clicked="OnOpenPdfClicked" />
+                    <Button x:Name="MergePdfButton"
+                            Text="Merge"
+                            BackgroundColor="{AppThemeBinding Light=#F8F9FB, Dark=#343944}"
+                            TextColor="{AppThemeBinding Light=#1F2430, Dark=#E9EDF5}"
+                            BorderColor="{AppThemeBinding Light=#C8D0DD, Dark=#4C5565}"
+                            BorderWidth="1"
+                            FontAttributes="None"
+                            CornerRadius="4"
+                            Padding="14,7"
+                            Clicked="OnMergePdfClicked" />
+                    <Button x:Name="OptimizePdfButton"
+                            Text="Optimize"
+                            BackgroundColor="{AppThemeBinding Light=#F8F9FB, Dark=#343944}"
+                            TextColor="{AppThemeBinding Light=#1F2430, Dark=#E9EDF5}"
+                            BorderColor="{AppThemeBinding Light=#C8D0DD, Dark=#4C5565}"
+                            BorderWidth="1"
+                            FontAttributes="None"
+                            CornerRadius="4"
+                            Padding="14,7"
+                            Clicked="OnOptimizePdfClicked" />
+                    <Button x:Name="OptimizeLossyPdfButton"
+                            Text="Optimize (Lossy)"
+                            BackgroundColor="{AppThemeBinding Light=#F8F9FB, Dark=#343944}"
+                            TextColor="{AppThemeBinding Light=#1F2430, Dark=#E9EDF5}"
+                            BorderColor="{AppThemeBinding Light=#C8D0DD, Dark=#4C5565}"
+                            BorderWidth="1"
+                            FontAttributes="None"
+                            CornerRadius="4"
+                            Padding="14,7"
+                            Clicked="OnOptimizeLossyPdfClicked" />
+                </HorizontalStackLayout>
+
+                <Button Grid.Column="1"
+                        x:Name="OpenInSystemViewerButton"
+                        Text="↗"
+                        FontSize="20"
+                        WidthRequest="44"
+                        HeightRequest="36"
+                        BackgroundColor="Transparent"
+                        TextColor="{AppThemeBinding Light=#1F2430, Dark=#E9EDF5}"
+                        Clicked="OnOpenInSystemViewerClicked" />
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1"
+                Padding="8,6"
+                Stroke="{AppThemeBinding Light=#CDD5E1, Dark=#3D4350}"
+                BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#25282E}">
+            <CollectionView x:Name="DocumentTabsCollectionView"
+                            HeightRequest="52"
+                            ItemsLayout="HorizontalList"
+                            SelectionMode="Single"
+                            SelectionChanged="OnDocumentTabSelectionChanged">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border Padding="10,6"
+                                HeightRequest="36"
+                                Margin="0,0,8,0"
+                                Stroke="{AppThemeBinding Light=#CDD5E1, Dark=#3D4350}"
+                                BackgroundColor="{AppThemeBinding Light=#F8FAFD, Dark=#2C313A}">
+                            <Grid ColumnDefinitions="*,Auto"
+                                  ColumnSpacing="8">
+                                <Label Text="{Binding DisplayTitle}"
+                                       TextColor="{AppThemeBinding Light=#1F2430, Dark=#E9EDF5}"
+                                       LineBreakMode="TailTruncation"
+                                       WidthRequest="220" />
+                                <Button Grid.Column="1"
+                                        Text="x"
+                                        Padding="8,0"
+                                        BackgroundColor="Transparent"
+                                        TextColor="{AppThemeBinding Light=#5E6470, Dark=#A7AFBF}"
+                                        CommandParameter="{Binding .}"
+                                        Clicked="OnCloseTabClicked" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.EmptyView>
+                    <Label Text="No PDF open. Use Open PDF to start."
+                           TextColor="{AppThemeBinding Light=#5E6470, Dark=#A7AFBF}" />
+                </CollectionView.EmptyView>
+            </CollectionView>
+        </Border>
+
+        <Grid Grid.Row="2"
+              ColumnDefinitions="260,*"
+              ColumnSpacing="0">
+            <Border Grid.Column="0"
+                    Stroke="{AppThemeBinding Light=#CDD5E1, Dark=#3D4350}"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#25282E}"
+                    Padding="8">
+                <Grid RowDefinitions="Auto,*"
+                      RowSpacing="8">
+                    <Label Text="Pages"
+                           TextColor="{AppThemeBinding Light=#1F2430, Dark=#E9EDF5}"
+                           FontAttributes="Bold" />
+                    <CollectionView Grid.Row="1"
+                                    x:Name="PagesCollectionView"
+                                    SelectionMode="Multiple"
+                                    SelectionChanged="OnPagesSelectionChanged"
+                                    VerticalOptions="Fill">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="10,8"
+                                        Margin="0,0,0,6"
+                                        Stroke="{AppThemeBinding Light=#CDD5E1, Dark=#3D4350}"
+                                        BackgroundColor="{AppThemeBinding Light=#F8FAFD, Dark=#2C313A}">
+                                    <FlyoutBase.ContextFlyout>
+                                        <MenuFlyout>
+                                            <MenuFlyoutItem Text="Delete Selected Pages"
+                                                            Clicked="OnDeleteSelectedPagesMenuClicked" />
+                                            <MenuFlyoutItem Text="Delete Page"
+                                                            CommandParameter="{Binding Number}"
+                                                            Clicked="OnDeletePageMenuClicked" />
+                                        </MenuFlyout>
+                                    </FlyoutBase.ContextFlyout>
+                                    <VerticalStackLayout Spacing="6">
+                                        <Border Stroke="{AppThemeBinding Light=#D6DBE4, Dark=#4B5361}"
+                                                BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#25282E}"
+                                                Padding="2"
+                                                HorizontalOptions="Center"
+                                                WidthRequest="220">
+                                            <Image Source="{Binding ThumbnailSource}"
+                                                   Aspect="AspectFit"
+                                                   HeightRequest="180"
+                                                   WidthRequest="216"
+                                                   HorizontalOptions="Center" />
+                                        </Border>
+                                        <Label Text="{Binding DisplayName}"
+                                               HorizontalTextAlignment="Center"
+                                               TextColor="{AppThemeBinding Light=#1F2430, Dark=#E9EDF5}" />
+                                    </VerticalStackLayout>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                        <CollectionView.EmptyView>
+                            <Label Text="No pages to show."
+                                   TextColor="{AppThemeBinding Light=#5E6470, Dark=#A7AFBF}" />
+                        </CollectionView.EmptyView>
+                    </CollectionView>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="1"
+                    Stroke="{AppThemeBinding Light=#CDD5E1, Dark=#3D4350}"
+                    BackgroundColor="{AppThemeBinding Light=#FFFFFF, Dark=#25282E}"
+                    Padding="8">
+                <Grid>
+                    <ContentView x:Name="PreviewHost"
+                                 VerticalOptions="Fill"
+                                 HorizontalOptions="Fill"
+                                 MinimumHeightRequest="120" />
+                    <Label x:Name="PreviewPlaceholderLabel"
+                           Text="Open a PDF to preview it here."
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           TextColor="{AppThemeBinding Light=#5E6470, Dark=#A7AFBF}" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="3"
+                Padding="10,6"
+                Stroke="{AppThemeBinding Light=#CDD5E1, Dark=#3D4350}"
+                BackgroundColor="{AppThemeBinding Light=#E6EBF3, Dark=#2A2D33}">
+            <Grid ColumnDefinitions="Auto,*,Auto"
+                  ColumnSpacing="10">
+                <ActivityIndicator x:Name="BusyIndicator"
+                                   IsVisible="False"
+                                   IsRunning="False" />
+                <Label Grid.Column="1"
+                       x:Name="StatusLabel"
+                       TextColor="{AppThemeBinding Light=#1F2430, Dark=#E9EDF5}"
+                       Text="Ready." />
+                <Label Grid.Column="2"
+                       x:Name="DebugStateLabel"
+                       FontSize="11"
+                       TextColor="{AppThemeBinding Light=#5E6470, Dark=#A7AFBF}"
+                       IsVisible="False" />
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

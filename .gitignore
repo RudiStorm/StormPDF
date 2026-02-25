@@ -1,0 +1,32 @@
+# Build output
+bin/
+obj/
+
+# IDE/editor
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# MAUI / Xamarin
+*.userprefs
+*.csproj.user
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+
+# Publish artifacts
+publish/
+AppPackages/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
